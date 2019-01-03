@@ -106,7 +106,7 @@ def cartesian_to_hyperspherical( x ):
 
     Parameters
     ----------
-    x              : list (of ints or floats)
+    x              : np.ndarray
         Coordinates of the n-tuple (x_1, x_2, x_3, ...)
 
     Returns
@@ -119,15 +119,16 @@ def cartesian_to_hyperspherical( x ):
         is bounded as [0, 2*pi)
     """
 
-    if not isinstance( x, list ):
-        x = list( x )
+    if not isinstance( x, np.ndarray ):
+        x = np.array( x )
     c_len = len( x )
 
     angs = np.zeros( c_len - 1 )
 
-    # If one variable, raise exception
+    # If one variable, return r = x and set all angles to 0
     if c_len is 1:
-        raise ValueError( "ValueError" )
+        r = float(x)
+        angs = 0
     # Else if two variables, call polar convenience function
     elif c_len is 2:
         r, angs[0] = cartesian_to_polar( x[0], x[1] )
@@ -137,13 +138,19 @@ def cartesian_to_hyperspherical( x ):
     # Else use general formula
     else:
 
-        r = 0
-        for i in x:
-            r += i**2
-        r = math.sqrt( r )
-        angs = None
+        # Find the radius
+        r = math.sqrt( ip.sum( x**2, start = 0, end = c_len ) )
 
         # Build angs by index
-        # Later
+        for i in np.arange( 0, c_len - 1 ):
+            angs[i] = math.acos( x[i] / math.sqrt( ip.sum( x**2, start = i, end = c_len ) ) )
+
+            # Check for float point errors
+            if abs( angs[i] ) < 1e-14:
+                angs[i] = 0.0
+
+        # Correction if x_n < 0
+        if x[-1] < 0:
+            angs[-1] = (2*math.pi) - angs[-1]
 
     return r, angs
