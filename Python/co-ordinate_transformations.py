@@ -111,9 +111,9 @@ def cartesian_to_hyperspherical( x ):
 
     Returns
     -------
-    r                 : int, float
+    r              : int, float
         Radius of hypersphere
-    angs              : list
+    angs           : list
         Angles of hypersphere
         By convention, all but the last angle are bounded as [0, pi], whereas the last angle
         is bounded as [0, 2*pi)
