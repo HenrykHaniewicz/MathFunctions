@@ -1,7 +1,7 @@
 # Newton's method functions
 
 # Imports
-from derivatives import definiteDerivative
+from derivative import definiteDerivative
 
 import math
 import decimal as deci

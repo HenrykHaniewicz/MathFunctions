@@ -42,8 +42,8 @@ def sum( list, func = None, start = 0, end = 10 ):
             for element in list[ start:end+1 ]:
                 sum += element
 
-    if abs( sum ) < 1e-14:
-        sum = 0
+        if abs( sum ) < 1e-14:
+            sum = 0
 
     return sum
 
@@ -86,7 +86,7 @@ def product( list, func = None, start = 0, end = 10 ):
             for element in list[ start:end+1 ]:
                 product *= element
 
-    if abs( product ) < 1e-14:
-        product = 0
+        if abs( product ) < 1e-14:
+            product = 0
 
     return product
