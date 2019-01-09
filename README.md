@@ -1,5 +1,7 @@
 # Multi-language mathematical functions
 
+I AM NOT AN AMAZING PROGRAMMER AND THIS IS A SIDE PROJECT SO I WELCOME PULL REQUESTS! :D
+
 Simple ports for math functions for a variety of different languages (but currently just C++ and Python). The aim of this little project is to be able to initialize these functions in code in pretty much the same way for the same results no matter what language (that I know how to code in) is required.
 
 ## Getting Started
