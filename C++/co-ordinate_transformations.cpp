@@ -2,10 +2,9 @@
 
 // Includes
 #include "co-ordinate_transformations.h"
+#include "iterative_processes.h"
 #include <iostream>
 #include <math.h>
-#include <cstdarg>
-#include <vector>
 
 /*
 2D
@@ -141,105 +140,115 @@ nD
 */
 
 // Hyperspherical to Cartesian
-#define COMMA ,
-#define LOGICAL_AND &&
 
-template <typename T, typename... PACK>
-std::tuple<float> hypersphericalToCartesian( T r, PACK... angles )
+template <typename T>
+std::vector<double> hypersphericalToCartesian( T r, const std::vector<double>& angles )
 {
 
-  float f = 1;
   /*
   Generalization of sphericalToCartesian in n-dimensional spheres
 
   Parameters
   ----------
-  r              : int, float
+  r              : custom typename T
       Radius of the hypersphere
-  *angles        : *args list (of ints or floats)
-      As many angles as necessary are supplied by the user
+  angles        : const std::vector<double>&
+      As many angles as necessary are supplied by the user as a vector {a, b, c, ...}
 
   Returns
   -------
-  X              : list
+  x              : std::vector<double>
       Cartesian coordinates of given radius and angles.
       By convention, r*cos(phi_{n-1}) is X[0] and r*sin(phi_{1})*...*sin(phi_{n-1}) is X[-1]
   */
 
-  const auto print_line = [=](auto a) { return unpackedAngles.push_back(a) ; };
+  std::vector<double> angs;
+  std::vector<double> sine_angs;
 
-  // unary right fold, syntax: ( pack_expression binary_operator ... )
-  ( print_line(angles) COMMA ... ) ;
-  //      pack_expression - an expression that contains an unexpanded parameter pack => print_line(pack)
-  //      binary_operator - any one of the permissible 32 binary binary_operators => COMMA ie. ,
+  for ( auto const& value : angles )
+  {
+    angs.push_back( value );
+  }
+  for ( int i = 0; i < angles.size() - 1; i++ )
+  {
+    if ( angs[i] < 0 || angs[i] > M_PI )
+    {
+      angs[i] = fmod( angs[i], M_PI );
+    }
+  }
+  angs.back() = fmod( angs.back(), (2 * M_PI) );
 
-  std::cout << '\n' ;
+  for ( auto const& value : angs )
+  {
+    sine_angs.push_back( sin( value ) );
+  }
 
-  // unary left fold, syntax: ( ... binary_operator pack_expression  )
-  ( ... LOGICAL_AND print_line(angles)  ) ;
-  //      binary_operator - any one of the permissible 32 binary binary_operators => LOGICAL_AND ie. &&
-  //      pack_expression - an expression that contains an unexpanded parameter pack => print_line(pack)
+  std::vector<double> x( ( angs.size() + 1 ), 1 );
 
-  std::cout << '\n' ;
+  for ( int i = 0; i < x.size(); i++ )
+  {
+    x[i] *= r;
+    x[i] *= ip::product( sine_angs, 0, i - 1 );
 
-  // binary left fold, syntax: ( init_expression binary_operator ... binary_operator pack_expression  )
-  ( ( std::cout << "result is: " ) COMMA ... COMMA print_line(angles) ) ;
-  //      init_expression - an expression that does not contain an unexpanded parameter pack => ( std::cout << "result: " )
-  //      binary_operator - any one of the permissible 32 binary binary_operators => COMMA ie ,
-  //      pack_expression - an expression that contains an unexpanded parameter pack => print_line(pack)
+    if ( i == ( x.size() - 1 ) )
+    {
+      x[i] *= sin( angs[ i - 1 ] );
+    }
+    else {
+      x[i] *= cos( angs[i] );
+    }
 
-  std::cout << '\n' ;
+  }
+  return x;
+}
 
-  // binary right fold, syntax: ( pack_expression binary_operator ... binary_operator init_expression   )
-  ( print_line(angles) LOGICAL_AND ... LOGICAL_AND ( std::cout << " (all items in the pack were printed)\n" ) ) ;
-  //      pack_expression - an expression that contains an unexpanded parameter pack => print_line(pack)
-  //      binary_operator - any one of the permissible 32 binary binary_operators => LOGICAL_AND ie. &&
-  //      init_expression - an expression that does not contain an unexpanded parameter pack => ( std::cout << " (all items in the pack were printed)\n" )
+template <typename T>
+std::vector<double> cartesianToHyperspherical( const std::vector<T>& x )
+{
+  /*
+  Generalization of cartesianToSpherical in n-dimensional spheres
 
-  // va_list args;
-  // va_start( args, angles );
-  //
-  // for ( int i = 0; i < angles; ++i ) {
-  //     std::cout << f << std::endl;
-  //     f += va_arg( args, int );
-  // }
-  //
-  // std::cout << f << std::endl;
+  Parameters
+  ----------
+  x              : const std::vector<T>& (T = int, float, double)
+      Cartesian co-ordinates in n-space
 
-  //
-  // angles = list( angles )
-  // a_len = len( angles )
-  // X = r * np.ones( a_len + 1 )
-  //
-  // # If there is one angle, use polar convenience function
-  // if a_len is 1:
-  //     X[1], X[0] = polar_to_cartesian( r, angles[0] )
-  // # Else if there are two angles, use spherical convenience function
-  // elif a_len is 2:
-  //     X[1], X[2], X[0] = spherical_to_cartesian( r, angles[0], angles[1] )
-  // # Else use general formula
-  // else:
-  //     for angle in angles[0:-1]:
-  //         if ( angle < 0 ) or ( angle > math.pi ):
-  //             angle = angle % (math.pi)
-  //     angles[-1] = angles[-1] % (2*math.pi)
-  //
-  //     # Build X by index
-  //     for i in np.arange( 0, a_len + 1 ):
-  //         X[i] *= ip.product( angles, math.sin, start = 0, end = i - 1 )
-  //
-  //         # Check if this is the last member of X
-  //         if i == ( a_len ):
-  //             X[i] *= math.sin( angles[ i-1 ] )
-  //         else:
-  //             X[i] *= math.cos( angles[i] )
-  //
-  //         # Check for float point errors
-  //         if abs( X[i] ) < 1e-14:
-  //             X[i] = 0.0
-  //
-  // return X
+  Returns
+  -------
+  r              : std::vector<double>
+      r[0] is the radius and r[1] -> r[n] are the angles
+      By convention, all but the last angle are bounded as [0, pi], whereas the last angle
+      is bounded as [0, 2*pi)
+  */
 
-  // va_end( args );
-  return std::make_tuple(f);
+  std::vector<double> r;
+  std::vector<T> squares;
+  for ( auto const& value : x )
+  {
+    squares.push_back( value * value );
+  }
+
+  r.push_back( sqrt( ip::sum( squares, 0, squares.size() ) ) );
+
+  for ( int i = 0; i < x.size() - 1; i++ )
+  {
+    r.push_back( acos( x[i] / ( sqrt( ip::sum( squares, i, squares.size() ) ) ) ) );
+
+    if ( abs( r[i+1] ) < 1e-14 )
+    {
+      r[i+1] = 0;
+    }
+  }
+
+  if ( r.back() < 0 )
+  {
+    r.back() = ( 2 * M_PI ) - r.back();
+  }
+
+  return r;
+}
+
+// For compile testing
+int main(){
+  return 0;
 }
