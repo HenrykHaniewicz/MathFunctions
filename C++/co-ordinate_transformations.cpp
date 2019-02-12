@@ -206,12 +206,12 @@ template <typename T>
 std::vector<double> cartesianToHyperspherical( const std::vector<T>& x )
 {
   /*
-  Generalization of cartesianToSpherical in n-dimensional spheres
+  Generalization of cartesianToSpherical in n-dimensional Euclidean space
 
   Parameters
   ----------
   x              : const std::vector<T>& (T = int, float, double)
-      Cartesian co-ordinates in n-space
+      Coordinates of the n-tuple (x_1, x_2, x_3, ...)
 
   Returns
   -------
@@ -230,15 +230,20 @@ std::vector<double> cartesianToHyperspherical( const std::vector<T>& x )
 
   r.push_back( sqrt( ip::sum( squares, 0, squares.size() ) ) );
 
-  for ( int i = 0; i < x.size() - 1; i++ )
+  for ( int i = 1; i < x.size(); i++ )
   {
-    r.push_back( acos( x[i] / ( sqrt( ip::sum( squares, i, squares.size() ) ) ) ) );
-
-    if ( abs( r[i+1] ) < 1e-14 )
+    r.push_back( acos( x[i-1] / ( sqrt( ip::sum( squares, i-1, squares.size() ) ) ) ) );
+    if ( i != x.size() - 1 )
     {
-      r[i+1] = 0;
+      r[i] = fmod( r[i], M_PI );
+    }
+    if ( abs( r[i] ) < 1e-14 )
+    {
+      r[i] = 0;
     }
   }
+
+  r.back() = fmod( r.back(), ( 2 * M_PI ) );
 
   if ( r.back() < 0 )
   {
