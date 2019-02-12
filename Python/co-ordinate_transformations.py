@@ -84,7 +84,7 @@ def hyperspherical_to_cartesian( r, *angles ):
 
         # Build X by index
         for i in np.arange( 0, a_len + 1 ):
-            X[i] *= ip.product( angles, math.sin, start = 0, end = i - 1 )
+            X[i] *= ip.product( sin( angles ), start = 0, end = i - 1 )
 
             # Check if this is the last member of X
             if i == ( a_len ):

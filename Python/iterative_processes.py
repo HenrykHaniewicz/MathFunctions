@@ -4,21 +4,19 @@
 import numpy as np
 
 
-def sum( list, func = None, start = 0, end = 10 ):
+def sum( list, start = 0, end = 10 ):
 
     """
-    Calculates the sum of a list or a function applied to a list
+    Calculates the sum of the elements in a list
 
     Parameters
     ----------
     list           : list, np.ndarray (of ints or floats)
         List (or array) or values to sum together
-    func           : callable
-        Optional function to apply to the list
     start          : int
-        Start index of product
+        Start index of sum
     end            : int
-        End index of product
+        End index of sum
 
     Returns
     -------
@@ -34,13 +32,8 @@ def sum( list, func = None, start = 0, end = 10 ):
     sum = 0.0
 
     if end >= start:
-
-        if func is not None:
-            for element in list[ start:end+1 ]:
-                sum += func( element )
-        else:
-            for element in list[ start:end+1 ]:
-                sum += element
+        for element in list[ start:end+1 ]:
+            sum += element
 
         if abs( sum ) < 1e-14:
             sum = 0
@@ -48,17 +41,15 @@ def sum( list, func = None, start = 0, end = 10 ):
     return sum
 
 
-def product( list, func = None, start = 0, end = 10 ):
+def product( list, start = 0, end = 10 ):
 
     """
-    Calculates the product of a list or a function applied to a list
+    Calculates the product of the elements in a list
 
     Parameters
     ----------
     list           : list, np.ndarray (of ints or floats)
         List (or array) or values to multiply
-    func           : callable
-        Optional function to apply to the list
     start          : int
         Start index of product
     end            : int
@@ -78,13 +69,8 @@ def product( list, func = None, start = 0, end = 10 ):
     product = 1.0
 
     if end >= start:
-
-        if func is not None:
-            for element in list[ start:end+1 ]:
-                product *= func( element )
-        else:
-            for element in list[ start:end+1 ]:
-                product *= element
+        for element in list[ start:end+1 ]:
+            product *= element
 
         if abs( product ) < 1e-14:
             product = 0
