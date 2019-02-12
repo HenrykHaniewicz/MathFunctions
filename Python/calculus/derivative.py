@@ -45,6 +45,6 @@ def definiteDerivative( func, x0, dx = 1e-25, float_prec = 56, rounding = True )
     # Disable rounding errors handler
     if rounding:
         exp = int( -math.log10( dx ) )
-        f_prime = D( roundSig( f_prime, exp ) )
+        f_prime = D( round( f_prime, exp ) )
 
     return f_prime

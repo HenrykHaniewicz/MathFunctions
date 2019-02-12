@@ -7,10 +7,6 @@ import math
 import decimal as deci
 from decimal import Decimal as D
 
-def roundSig( x, sig = 2 ):
-    """Rounds x to `sig` significant figures"""
-    return round( x, sig - int( math.floor( math.log10( abs( x ) ) ) ) - 1 )
-
 def newtonsMethod( func, guess, iterations = 10, **kwargs ):
 
     """
