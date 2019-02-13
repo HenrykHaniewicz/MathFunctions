@@ -5,7 +5,7 @@ with open( "README.md", "r" ) as fh:
 
 setuptools.setup(
     name="MathFunctions - Python",
-    version="0.0.1",
+    version="0.0.1a",
     author="Henryk Haniewicz",
     author_email="henryk.haniewicz@gmail.com",
     description="A small math package for my own amusement",
